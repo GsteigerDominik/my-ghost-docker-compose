@@ -1,0 +1,35 @@
+version: '3.1'
+volumes:
+  mysql-volume:
+  ghost-volume:
+
+services:
+ mysql:
+  image: mysql:8.0.36-debian
+  container_name: mysql
+  volumes:
+    - mysql-volume:/var/lib/mysql1
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: db
+    MYSQL_USER: blog-user
+    MYSQL_PASSWORD: supersecret
+
+ ghost:
+  build: ./ghost
+  image: ghost:5.80.0
+  container_name: ghost
+  volumes:
+    - ghost-volume:/var/lib/ghost1
+  restart: always
+  ports:
+    - 8080:2368
+  environment:
+    url: http://localhost:8080
+    database__client: mysql
+    database__connection__host: mysql
+    database__connection__user: blog-user
+    database__connection__password: supersecret
+    database__connection__database: db
+  depends_on:
+    - mysql
